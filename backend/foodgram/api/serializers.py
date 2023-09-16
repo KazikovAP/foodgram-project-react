@@ -14,7 +14,7 @@ class UserCreateSerializer(DjoserUserCreateSerializer):
 
     class Meta:
         model = User
-        fields = ('email', 'username', 'first_name', 'last_name', 'password')
+        fields = ('email', 'username', 'first_name', 'last_name', 'password',)
 
 
 class UsersSerializer(DjoserUserSerializer):
@@ -27,9 +27,8 @@ class UsersSerializer(DjoserUserSerializer):
 
     def get_is_subscribed(self, obj):
         user = self.context.get('request').user
-        if user.is_anonymous:
-            return False
-        return Follow.objects.filter(user=user, author=obj).exists()
+        return not user.is_anonymous and Follow.objects.filter(
+            user=user, author=obj).exists()
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -43,7 +42,7 @@ class IngredientSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Ingredient
-        fields = ('id', 'name', 'measurement_unit')
+        fields = ('id', 'name', 'measurement_unit',)
 
 
 class IngredientInRecipeReadSerializer(serializers.ModelSerializer):
@@ -71,19 +70,16 @@ class RecipeReadSerializer(serializers.ModelSerializer):
         fields = ('id', 'tags', 'author',
                   'ingredients', 'is_favorited',
                   'is_in_shopping_cart', 'image',
-                  'name', 'text', 'cooking_time')
+                  'name', 'text', 'cooking_time',)
 
     def get_is_favorited(self, obj):
         user = self.context.get('request').user
-        if user.is_anonymous:
-            return False
-        return user.favorite.filter(recipe=obj).exists()
+        return not user.is_anonymous and user.favorite.filter(
+            recipe=obj).exists()
 
     def get_is_in_shopping_cart(self, obj):
         user = self.context.get('request').user
-        if user.is_anonymous:
-            return False
-        return user.shop.filter(recipe=obj).exists()
+        return not user.is_anonymous and user.shop.filter(recipe=obj).exists()
 
 
 class IngredientInRecipeCreateSerializer(serializers.ModelSerializer):
@@ -104,7 +100,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipes
         fields = ('id', 'tags', 'author', 'ingredients',
-                  'image', 'name', 'text', 'cooking_time')
+                  'image', 'name', 'text', 'cooking_time',)
 
     def validate(self, data):
         ingredients = self.initial_data.get('ingredients')
@@ -172,7 +168,7 @@ class RecipeShortSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Recipes
-        fields = ('id', 'name', 'image', 'cooking_time')
+        fields = ('id', 'name', 'image', 'cooking_time',)
 
 
 class FollowSerializer(UsersSerializer):

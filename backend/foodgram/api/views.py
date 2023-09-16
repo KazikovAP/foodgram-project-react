@@ -82,8 +82,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def favorite(self, request, pk):
         if request.method == 'POST':
             return self.add_obj(Favorite, request.user, pk)
-        else:
-            return self.delete_obj(Favorite, request.user, pk)
+        return self.delete_obj(Favorite, request.user, pk)
 
     @action(
         detail=True,
@@ -93,8 +92,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def shopping_cart(self, request, pk):
         if request.method == 'POST':
             return self.add_obj(ShopCart, request.user, pk)
-        else:
-            return self.delete_obj(ShopCart, request.user, pk)
+        return self.delete_obj(ShopCart, request.user, pk)
 
     @action(
         detail=False,
@@ -102,7 +100,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         permission_classes=[IsAuthenticated]
     )
     def download_shopping_cart(self, request):
-        string = 'Покупки: '
+        string = f'Список покупок для : {request.user.username}\n'
         ingredients = IngredientInRecipe.objects.filter(
             recipe__shop__author=request.user
         ).values(
@@ -110,13 +108,15 @@ class RecipeViewSet(viewsets.ModelViewSet):
         ).annotate(amount=Sum('amount'))
         for num, i in enumerate(ingredients):
             string += (
-                f'\n-{i["ingredient__name"]} - {i["amount"]} '
+                f'\n* {i["ingredient__name"]} — {i["amount"]} '
                 f'{i["ingredient__measurement_unit"]}'
             )
             if num < ingredients.count() - 1:
-                string += ', '
+                string += '; '
         filename = f'{request.user.username}_string.txt'
-        response = HttpResponse(string, content_type='text/plain')
+        response = HttpResponse(
+            f'{string} \n\nУдачные покупки только с Foodgram:)',
+            content_type='text/plain')
         response['Content-Disposition'] = f'attachment; filename="{filename}'
         return response
 
