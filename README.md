@@ -93,13 +93,126 @@ docker-compose exec backend python manage.py create_tags
 docker-compose exec backend python manage.py createsuperuser
 ```
 
+
+---
+## Деплой проекта на сервер:
+
+**1. Подключитесь к удаленному серверу:**
+
+```
+ssh -i путь_до_файла_с_SSH_ключом/название_файла_с_SSH_ключом имя_пользователя@ip_адрес_сервера 
+```
+
+**2. Очистите лишние данные на сервере:**
+
+- Удалите все лишние папки в рабочей директории:
+
+```
+rm -rf <имя_папки>
+```
+
+- Очистите кеш npm: в нём содержатся сохранённые файлы зависимостей фронтенда, которые обычно требуются, чтобы не скачивать их повторно.
+
+```
+npm cache clean --force
+```
+
+- Очистите кеш APT: он хранит файлы для установки системных зависимостей Linux; после установки эти файлы не понадобятся, можно их удалить:
+
+```
+sudo apt-get clean
+```
+
+- Старые системные логи тоже не понадобятся, можно их удалить (при выполнении этой команды будут удалены все логи, созданные более одного дня назад):
+
+```
+sudo journalctl --vacuum-time=1d
+```
+
+**3. Создайте на сервере директорию foodgram через терминал:**
+
+```
+mkdir foodgram
+cd foodgram
+```
+
+**4. В директорию foodgram/ скопируйте или создайте файл .env:**
+
+```
+scp -i <path_to_SSH/SSH_name> .env <username@server_ip>:/home/<username>/foodgram/.env
+* ath_to_SSH — путь к файлу с SSH-ключом;
+* SSH_name — имя файла с SSH-ключом (без расширения);
+* username — ваше имя пользователя на сервере;
+* server_ip — IP вашего сервера.
+ ```
+
+- или
+
+```
+sudo nano .env
+```
+
+**5. Скопируйте файлы из локальной директории infra на сервер:**
+
+```
+scp -r infra/* <username@server_ip>:/home/<username>/foodgram/
+```
+
+- или
+
+```
+sudo nano <имя_файла>
+```
+
+**6. Запустите docker compose в режиме демона из папки infra:**
+
+```
+sudo docker compose -f docker-compose.yml up -d
+```
+
+**7. Запустите окружение:**
+
+- выполните миграции:
+
+```
+sudo docker compose -f docker-compose.yml exec backend python manage.py makemigrations
+sudo docker compose -f docker-compose.yml exec backend python manage.py migrate
+```
+
+- соберите статику:
+
+```
+sudo docker compose -f docker-compose.yml exec backend python manage.py collectstatic
+sudo docker compose -f docker-compose.yml exec backend cp -r /app/collected_static/. /backend_static/static/
+```
+
+- загрузите в базу данных список ингредиентов:
+
+```
+sudo docker compose -f docker-compose.yml exec backend python manage.py load_csv
+
+```
+
+- загрузите в базу данных заготовленные теги:
+
+```
+sudo docker compose -f docker-compose.yml exec backend python manage.py create_tags
+
+```
+
+- создайте суперпользователя:
+
+```
+sudo docker compose -f docker-compose.yml exec backend python manage.py createsuperuser
+```
+
+
 ---
 ## Workflow
 - **tests:** Проверка кода на соответствие PEP8.
 - **push Docker image to Docker Hub:** Сборка и публикация образа на DockerHub.
 - **deploy:** Автоматический деплой на боевой сервер при пуше в главную ветку main.
 - **send_massage:** Отправка уведомления в телеграм-чат.
-
 
 ---
 ## Разработал:
