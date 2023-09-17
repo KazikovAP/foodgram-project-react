@@ -1,13 +1,13 @@
 from django.db import transaction
-from djoser.serializers import (
-    UserCreateSerializer as DjoserUserCreateSerializer,
-    UserSerializer as DjoserUserSerializer)
+from djoser.serializers import \
+    UserCreateSerializer as DjoserUserCreateSerializer
+from djoser.serializers import UserSerializer as DjoserUserSerializer
 from drf_extra_fields.fields import Base64ImageField
+from recipes.models import Ingredient, IngredientInRecipe, Recipes, Tags
 from rest_framework import serializers
-from rest_framework.relations import PrimaryKeyRelatedField
 from rest_framework.fields import IntegerField, SerializerMethodField
-from recipes.models import (Ingredient, Tags, Recipes, IngredientInRecipe)
-from users.models import User, Follow
+from rest_framework.relations import PrimaryKeyRelatedField
+from users.models import Follow, User
 
 
 class UserCreateSerializer(DjoserUserCreateSerializer):
