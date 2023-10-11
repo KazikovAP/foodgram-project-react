@@ -22,9 +22,9 @@ Foodgram («Продуктовый помощник») - это сайт, на �
 * Python 3.9
 * Django 3.2.3
 * Django Rest Framework 3.12.4
-* djoser==2.1.0
-* gunicorn==20.1.0
-* psycopg2-binary==2.9.3
+* djoser 2.1.0
+* gunicorn 20.1.0
+* psycopg2-binary 2.9.3
 
 ---
 ## Запуск проекта локально:
