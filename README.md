@@ -221,3 +221,4 @@ sudo docker compose -f docker-compose.yml exec backend python manage.py createsu
 ---
 ## Лицензия:
 [MIT](https://opensource.org/licenses/MIT)
+
